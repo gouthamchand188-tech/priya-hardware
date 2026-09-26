@@ -33,7 +33,7 @@ function render() {
 
   grid.innerHTML = products.map(p => `
     <article class="card">
-      <div class="pic">${p.image || "📦"}</div>
+      <div class="pic">${p.image ? '<img src="' + p.image + '" alt="' + p.name + '">' : "📦"}</div>
 
       <h3>${p.name}</h3>
 
