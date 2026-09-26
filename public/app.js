@@ -48,6 +48,9 @@ function render() {
       <button class="add" onclick="add(${p.id})">
         Add to Cart
       </button>
+      <button class="add" onclick="showDetails(${p.id})">
+  View Details
+</button>
     </article>
   `).join("");
 }
