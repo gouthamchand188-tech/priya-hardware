@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Priya Hardware Admin Login</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .login {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    p {
+      text-align: center;
+      color: #666;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #111;
+      color: white;
+      border: 0;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    #error {
+      color: #d00;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login">
+    <h1>PRIYA HARDWARE</h1>
+    <p>Admin Login</p>
+
+    <form id="loginForm">
+      <input
+        id="password"
+        type="password"
+        placeholder="Admin Password"
+        required
+      >
+
+      <button type="submit">
+        Login
+      </button>
+    </form>
+
+    <div id="error"></div>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const error = document.getElementById("error");
+
+      error.textContent = "";
+
+      try {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            password: password
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          error.textContent = data.error || "Login failed";
+          return;
+        }
+
+        window.location.href = "/admin.html";
+
+      } catch (err) {
+        error.textContent = "Unable to connect to server";
+      }
+    });
+  </script>
+
+</body>
+</html>
