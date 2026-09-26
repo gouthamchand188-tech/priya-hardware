@@ -210,6 +210,18 @@ async function placeOrder(event) {
     alert("Something went wrong. Please try again.");
   }
 }
+function showDetails(id) {
+  const product = products.find(p => p.id === id);
 
+  if (!product) return;
+
+  alert(
+    "Product: " + product.name +
+    "\n\nBrand: " + (product.brand || "Priya Hardware") +
+    "\nCategory: " + product.category +
+    "\nPrice: " + money(product.price) +
+    "\n\nDescription:\n" + (product.description || "No description available.")
+  );
+}
 save();
 load();
