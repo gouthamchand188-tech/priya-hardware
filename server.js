@@ -137,6 +137,32 @@ app.post("/api/products",requireAdmin,(q,s)=>{
   }
 });
 
+app.put("/api/products/:id",requireAdmin,(q,s)=>{
+  const p=q.body;
+  if(!p.name||!p.category)
+    return s.status(400).json({error:"Name and category required"});
+
+  try{
+    db.prepare(
+      "UPDATE products SET sku=?,name=?,category=?,brand=?,price=?,mrp=?,stock=?,description=?,image=? WHERE id=?"
+    ).run(
+      p.sku||"",
+      p.name,
+      p.category,
+      p.brand||"",
+      +p.price||0,
+      +p.mrp||0,
+      +p.stock||0,
+      p.description||"",
+      p.image||"",
+      q.params.id
+    );
+
+    s.json({ok:true});
+  }catch(e){
+    s.status(400).json({error:e.message});
+  }
+});
 app.delete("/api/products/:id",requireAdmin,(q,s)=>{
   db.prepare("UPDATE products SET active=0 WHERE id=?").run(q.params.id);
   s.json({ok:true});
