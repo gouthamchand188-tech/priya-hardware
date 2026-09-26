@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product | Priya Hardware</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header">
+
+  <div class="logo">
+    <div class="logo-icon">🛠️</div>
+    <div>
+      <strong>PRIYA</strong>
+      <span>HARDWARE</span>
+      <small>Build Your Dreams With Us</small>
+    </div>
+  </div>
+
+  <button class="cart-button" onclick="window.location.href='index.html'">
+    ← Back to Store
+  </button>
+
+</header>
+
+<main class="product-page">
+
+  <div id="product-loading">Loading product...</div>
+
+  <section id="product-details" class="product-detail-card" style="display:none;">
+
+    <div class="product-large-image">
+      <img id="product-image" src="" alt="">
+    </div>
+
+    <div class="product-info">
+
+      <p id="product-category" class="product-category"></p>
+
+      <h1 id="product-name"></h1>
+
+      <div class="rating">
+        ⭐ <strong id="product-rating">0</strong>
+        <span id="review-count">(0 reviews)</span>
+      </div>
+
+      <div id="product-price" class="product-big-price"></div>
+
+      <p id="product-brand"></p>
+
+      <hr>
+
+      <h3>Product Description</h3>
+      <p id="product-description"></p>
+
+      <div class="product-actions">
+        <button id="add-button" class="big-add">
+          🛒 Add to Cart
+        </button>
+
+        <button id="buy-button" class="buy-button">
+          Buy Now
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="reviews-section">
+
+    <h2>Customer Reviews</h2>
+
+    <div id="reviews-list">
+      Loading reviews...
+    </div>
+
+    <div class="review-box">
+
+      <h3>Write a Review</h3>
+
+      <select id="review-rating">
+        <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+        <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+        <option value="3">⭐⭐⭐ 3 Stars</option>
+        <option value="2">⭐⭐ 2 Stars</option>
+        <option value="1">⭐ 1 Star</option>
+      </select>
+
+      <textarea
+        id="review-comment"
+        placeholder="Write your review..."
+      ></textarea>
+
+      <button onclick="submitReview()" class="review-button">
+        Submit Review
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const productId = params.get("id");
+
+let product = null;
+
+const money = n =>
+  "₹" + Number(n).toLocaleString("en-IN");
+
+
+async function loadProduct() {
+
+  if (!productId) {
+    document.getElementById("product-loading").textContent =
+      "Product not found.";
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch("/api/products/" + productId);
+
+    if (!response.ok) {
+      throw new Error();
+    }
+
+    product = await response.json();
+
+    document.getElementById("product-loading").style.display = "none";
+
+    document.getElementById("product-details").style.display = "grid";
+
+    document.getElementById("product-name").textContent =
+      product.name;
+
+    document.getElementById("product-category").textContent =
+      product.category;
+
+    document.getElementById("product-brand").textContent =
+      "Brand: " + (product.brand || "Priya Hardware");
+
+    document.getElementById("product-price").textContent =
+      money(product.price);
+
+    document.getElementById("product-description").textContent =
+      product.description || "No description available.";
+
+    document.getElementById("product-rating").textContent =
+      Number(product.rating || 0).toFixed(1);
+
+    document.getElementById("review-count").textContent =
+      "(" + (product.reviews || 0) + " reviews)";
+
+    const image =
+      document.getElementById("product-image");
+
+    if (product.image && product.image.startsWith("http")) {
+      image.src = product.image;
+    } else {
+      image.style.display = "none";
+      document.querySelector(".product-large-image").textContent =
+        product.image || "📦";
+    }
+
+    document.getElementById("add-button").onclick =
+      () => addToCart(product.id);
+
+    document.getElementById("buy-button").onclick =
+      () => buyNow(product.id);
+
+    loadReviews();
+
+  } catch (error) {
+
+    document.getElementById("product-loading").textContent =
+      "Unable to load product.";
+
+  }
+}
+
+
+function addToCart(id) {
+
+  let cart =
+    JSON.parse(localStorage.getItem("phcart") || "[]");
+
+  const existing =
+    cart.find(item => item.id === id);
+
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({
+      id: id,
+      qty: 1
+    });
+  }
+
+  localStorage.setItem(
+    "phcart",
+    JSON.stringify(cart)
+  );
+
+  alert("Product added to cart!");
+
+}
+
+
+function buyNow(id) {
+
+  addToCart(id);
+
+  window.location.href = "index.html";
+
+}
+
+
+async function loadReviews() {
+
+  const response =
+    await fetch("/api/products/" + productId + "/reviews");
+
+  const reviews =
+    await response.json();
+
+  const box =
+    document.getElementById("reviews-list");
+
+  if (!reviews.length) {
+
+    box.innerHTML =
+      "<p>No reviews yet. Be the first to review this product!</p>";
+
+    return;
+
+  }
+
+  box.innerHTML =
+    reviews.map(review => `
+
+      <div class="review-card">
+
+        <strong>${review.name || "Customer"}</strong>
+
+        <div>
+          ${"⭐".repeat(review.rating)}
+        </div>
+
+        <p>${review.comment}</p>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+async function submitReview() {
+
+  const rating =
+    document.getElementById("review-rating").value;
+
+  const comment =
+    document.getElementById("review-comment").value.trim();
+
+  if (!comment) {
+
+    alert("Please write a review.");
+
+    return;
+
+  }
+
+  const response =
+    await fetch(
+      "/api/products/" + productId + "/reviews",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          rating: Number(rating),
+          comment: comment
+        })
+      }
+    );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+
+    alert(data.error || "Please login first.");
+
+    return;
+
+  }
+
+  alert("Review submitted!");
+
+  document.getElementById("review-comment").value = "";
+
+  loadReviews();
+
+}
+
+
+loadProduct();
+
+</script>
+
+</body>
+</html>
