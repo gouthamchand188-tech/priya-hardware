@@ -1,29 +1,46 @@
-PRIYA HARDWARE REAL STORE STARTER
+# Priya Hardware — Complete E-commerce Upgrade
 
-Run:
+This project upgrades the existing Priya Hardware store into an Amazon-style hardware e-commerce experience (using its own Priya Hardware branding).
+
+## Included
+
+### Customer
+- Home / hero / categories
+- Product search, category filtering, price filtering and sorting
+- Product details
+- Product images with upload support from Admin
+- Cart with quantity controls
+- Wishlist
+- Customer registration/login
+- Checkout and COD/ONLINE method selection
+- My Orders with status tracking
+- Product reviews
+
+### Admin
+- Dashboard statistics
+- Add/edit/delete products
+- Product image upload
+- Inventory/stock
+- Orders and order-status updates
+- Category overview
+- Store shortcut
+
+### Data
+SQLite stores products, customers, sessions, orders and reviews.
+
+## Run locally
+
 1. Install Node.js 20+.
-2. Open terminal in this folder.
-3. npm install
-4. npm start
-5. Visit http://localhost:3000
-6. Admin: http://localhost:3000/admin.html
+2. Run `npm install`.
+3. Set an admin password:
+   - Windows PowerShell: `$env:ADMIN_PASSWORD="your-password"`
+   - macOS/Linux: `export ADMIN_PASSWORD="your-password"`
+4. Run `npm start`.
+5. Open `http://localhost:3000`.
+6. Admin login: `http://localhost:3000/admin-login.html`.
 
-This includes a real local SQLite product/order database, storefront, cart, COD order creation and admin dashboard.
+## Render
 
-Before public launch, add:
-- Razorpay/other payment gateway with server-side secrets + webhooks
-- Admin authentication
-- HTTPS
-- Real 4000+ product import from your Excel/CSV
-- Product images/storage
-- Shipping/tax rules
-- Customer accounts
-- Email/WhatsApp notifications
-- Backup, security, returns/privacy/terms
+The included `render.yaml` uses `/var/data` for SQLite so a Render persistent disk can keep the database. Set `ADMIN_PASSWORD` in Render environment variables.
 
-Business:
-Priya Hardware
-117, A AJ Pet Road, Podaturpet - 631208
-9789816496 / 7276864188
-WhatsApp both
-navaratanchoadharynavaratan@gmail.com
+A real payment gateway is not included; selecting ONLINE records the payment method. A gateway such as Razorpay/Stripe can be connected after the store flow is working.
