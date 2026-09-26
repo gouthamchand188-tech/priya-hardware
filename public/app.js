@@ -32,8 +32,15 @@ function render() {
   status.textContent = `${products.length} products shown`;
 
   grid.innerHTML = products.map(p => `
-    <article class="card">
-      <div class="pic">${p.image ? '<img src="' + p.image + '" alt="' + p.name + '">' : "📦"}</div>
+    <article class="card product-card" onclick="openProduct(${p.id})">
+
+      <div class="pic">
+        ${
+          p.image
+            ? '<img src="' + p.image + '" alt="' + p.name + '">'
+            : "📦"
+        }
+      </div>
 
       <h3>${p.name}</h3>
 
@@ -45,14 +52,25 @@ function render() {
         ${money(p.price)}
       </div>
 
-      <button class="add" onclick="add(${p.id})">
+      <button
+        class="add"
+        onclick="event.stopPropagation(); add(${p.id})">
         Add to Cart
       </button>
-      <button class="add" onclick="showDetails(${p.id})">
-  View Details
-</button>
+
+      <button
+        class="add"
+        onclick="event.stopPropagation(); openProduct(${p.id})">
+        View Details
+      </button>
+
     </article>
   `).join("");
+}
+
+function openProduct(id) {
+  window.location.href =
+    "product-details.html?id=" + encodeURIComponent(id);
 }
 
 function add(id) {
@@ -114,7 +132,11 @@ function cartEl() {
       <div class="cartrow">
 
         <div class="pic">
-          ${product.image || "📦"}
+          ${
+            product.image
+              ? '<img src="' + product.image + '" alt="' + product.name + '">'
+              : "📦"
+          }
         </div>
 
         <div>
@@ -210,18 +232,6 @@ async function placeOrder(event) {
     alert("Something went wrong. Please try again.");
   }
 }
-function showDetails(id) {
-  const product = products.find(p => p.id === id);
 
-  if (!product) return;
-
-  alert(
-    "Product: " + product.name +
-    "\n\nBrand: " + (product.brand || "Priya Hardware") +
-    "\nCategory: " + product.category +
-    "\nPrice: " + money(product.price) +
-    "\n\nDescription:\n" + (product.description || "No description available.")
-  );
-}
 save();
 load();
