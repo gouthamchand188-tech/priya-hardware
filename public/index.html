@@ -1,8 +1,174 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Priya Hardware</title><link rel="stylesheet" href="/style.css"></head><body>
-<header><div class="brand"><b>⌂⚒</b><span>PRIYA<em>HARDWARE</em><small>Build Your Dreams With Us</small></span></div><div class="search"><input id="q" placeholder="Search 4000+ products..." onkeydown="if(event.key==='Enter')load()"><button onclick="load()">🔎</button></div><button onclick="openCart()">🛒 <i id="count">0</i></button></header>
-<nav><button onclick="setCat('')">All</button><button onclick="setCat('Paints')">Paints</button><button onclick="setCat('Pipes')">Pipes</button><button onclick="setCat('Fittings')">Fittings</button><button onclick="setCat('Electrical')">Electrical</button><button onclick="setCat('Hardware')">Hardware</button></nav>
-<section class="hero"><div><small>PRIYA HARDWARE • PODATURPET</small><h1>Everything you need for your next project.</h1><p>Paints, pipes, fittings, electricals and hardware — online ordering with COD.</p><button onclick="document.getElementById('products').scrollIntoView()" class="primary">Shop Now →</button></div><div class="art">🎨 ◯ 🔩 ⚡ 🛠</div></section>
-<section id="products"><h2>Products</h2><p id="status"></p><div id="grid"></div></section>
-<footer><b>PRIYA HARDWARE</b><p>117, A AJ Pet Road, Podaturpet - 631208</p><p>☎ 9789816496 | 7276864188</p><p>💬 WhatsApp: both numbers</p><p>✉ navaratanchoadharynavaratan@gmail.com</p></footer>
-<div id="cart" class="modal"><div class="panel"><button class="x" onclick="closeCart()">×</button><h2>Your Cart</h2><div id="cartList"></div><h3>Total: <span id="total">₹0</span></h3><button class="primary wide" onclick="checkout()">Checkout</button></div></div>
-<div id="checkout" class="modal"><div class="panel"><button class="x" onclick="closeCheckout()">×</button><h2>Checkout</h2><form onsubmit="placeOrder(event)"><input id="name" required placeholder="Full name"><input id="phone" required pattern="[0-9]{10}" placeholder="10-digit phone"><input id="email" type="email" placeholder="Email"><textarea id="address" required placeholder="Full delivery address"></textarea><select id="pay"><option>COD</option><option>ONLINE</option></select><button class="primary wide">Place Order</button></form></div></div><script src="/app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priya Hardware | Build Your Dreams</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header">
+
+  <div class="logo">
+    <div class="logo-icon">🛠️</div>
+    <div>
+      <strong>PRIYA</strong>
+      <span>HARDWARE</span>
+      <small>Build Your Dreams With Us</small>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <input id="q" type="text" placeholder="Search 4000+ products...">
+    <button onclick="load()">🔍</button>
+  </div>
+
+  <button class="cart-button" onclick="openCart()">
+    🛒 <span id="count">0</span>
+  </button>
+
+</header>
+
+
+<nav class="categories">
+  <button onclick="setCat('')">All</button>
+  <button onclick="setCat('Paints')">Paints</button>
+  <button onclick="setCat('Pipes')">Pipes</button>
+  <button onclick="setCat('Fittings')">Fittings</button>
+  <button onclick="setCat('Electrical')">Electrical</button>
+  <button onclick="setCat('Hardware')">Hardware</button>
+</nav>
+
+
+<main>
+
+  <section class="hero">
+
+    <div class="hero-content">
+      <p class="eyebrow">PRIYA HARDWARE • PODATURPET</p>
+
+      <h1>
+        Everything you need<br>
+        for your next project.
+      </h1>
+
+      <p>
+        Paints, pipes, fittings, electricals and hardware —
+        all in one place.
+      </p>
+
+      <button onclick="document.getElementById('grid').scrollIntoView({behavior:'smooth'})">
+        Shop Now →
+      </button>
+    </div>
+
+    <div class="hero-icons">
+      <span>🎨</span>
+      <span>⭕</span>
+      <span>🔩</span>
+      <span>⚡</span>
+      <span>🛠️</span>
+    </div>
+
+  </section>
+
+
+  <section class="products-section">
+
+    <div class="section-heading">
+      <div>
+        <p class="section-label">OUR STORE</p>
+        <h2>Popular Products</h2>
+      </div>
+
+      <span id="status"></span>
+    </div>
+
+    <div id="grid" class="product-grid"></div>
+
+  </section>
+
+</main>
+
+
+<!-- CART -->
+
+<div id="cart" class="modal">
+
+  <div class="modal-panel">
+
+    <button class="close" onclick="closeCart()">×</button>
+
+    <h2>Your Cart</h2>
+
+    <div id="cartList"></div>
+
+    <h3>
+      Total: <span id="total">₹0</span>
+    </h3>
+
+    <button class="checkout-btn" onclick="checkout()">
+      Checkout
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- CHECKOUT -->
+
+<div id="checkout" class="modal">
+
+  <div class="modal-panel">
+
+    <button class="close" onclick="closeCheckout()">×</button>
+
+    <h2>Checkout</h2>
+
+    <form onsubmit="placeOrder(event)">
+
+      <input id="name" required placeholder="Your Name">
+
+      <input id="phone" required placeholder="Phone Number">
+
+      <input id="email" type="email" required placeholder="Email Address">
+
+      <input id="address" required placeholder="Delivery Address">
+
+      <select id="pay" required>
+        <option value="">Select Payment Method</option>
+        <option value="Cash on Delivery">Cash on Delivery</option>
+        <option value="UPI">UPI</option>
+      </select>
+
+      <button class="checkout-btn" type="submit">
+        Place Order
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<footer>
+
+  <strong>PRIYA HARDWARE</strong>
+
+  <p>117, A.J. Pet Road, Podaturpet - 631208</p>
+
+  <p>📞 9789816496 &nbsp; | &nbsp; 7276864188</p>
+
+  <p>© 2026 Priya Hardware. All rights reserved.</p>
+
+</footer>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
