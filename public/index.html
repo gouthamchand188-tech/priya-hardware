@@ -170,6 +170,22 @@
 
 
 <script src="app.js"></script>
+<div id="tracker" class="modal">
+  <div class="modal-panel">
+    <button class="close" onclick="closeTracker()">×</button>
 
+    <h2>📦 Track Your Order</h2>
+
+    <input id="trackOrderNo" placeholder="Enter Order Number">
+
+    <input id="trackPhone" placeholder="Enter Phone Number">
+
+    <button class="checkout-btn" onclick="trackOrder()">
+      Track Order
+    </button>
+
+    <div id="trackingResult"></div>
+  </div>
+</div>
 </body>
 </html>
