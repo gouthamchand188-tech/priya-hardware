@@ -117,3 +117,114 @@ async function orders(){
 
 load();
 orders();
+function parseCSV(text) {
+  const rows = [];
+  let row = [], cell = "", quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const n = text[i + 1];
+
+    if (c === '"') {
+      if (quoted && n === '"') {
+        cell += '"';
+        i++;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (c === "," && !quoted) {
+      row.push(cell);
+      cell = "";
+    } else if ((c === "\n" || c === "\r") && !quoted) {
+      if (c === "\r" && n === "\n") i++;
+      row.push(cell);
+      cell = "";
+
+      if (row.some(x => x.trim() !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+    } else {
+      cell += c;
+    }
+  }
+
+  if (cell !== "" || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  if (!rows.length) return [];
+
+  const headers = rows[0].map(x => x.trim().toLowerCase());
+
+  return rows.slice(1).map(r => {
+    const o = {};
+    headers.forEach((h, i) => {
+      o[h] = (r[i] ?? "").trim();
+    });
+    return o;
+  }).filter(x => x.sku && x.name && x.category);
+}
+
+async function bulkImport(e) {
+  e.preventDefault();
+
+  const file = document.getElementById("bulkFile").files[0];
+  if (!file) return;
+
+  const status = document.getElementById("bulkStatus");
+
+  status.textContent = "Reading CSV...";
+
+  const text = await file.text();
+  const products = parseCSV(text);
+
+  if (!products.length) {
+    status.textContent =
+      "No valid rows found. SKU, name and category are required.";
+    return;
+  }
+
+  let imported = 0;
+
+  for (let i = 0; i < products.length; i += 500) {
+    const batch = products.slice(i, i + 500);
+
+    status.textContent =
+      `Uploading ${Math.min(i + batch.length, products.length)} / ${products.length}...`;
+
+    const r = await fetch("/api/products/bulk", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        products: batch
+      })
+    });
+
+    const d = await r.json();
+
+    if (!r.ok) {
+      status.textContent =
+        "Import stopped: " + (d.error || "Unknown error");
+      return;
+    }
+
+    imported += Number(d.imported || 0);
+  }
+
+  status.textContent =
+    `Done. ${imported} products imported/updated.`;
+
+  if (typeof load === "function") {
+    load();
+  }
+}
+
+document.getElementById("bulkForm")?.addEventListener(
+  "submit",
+  bulkImport
+);
