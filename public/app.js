@@ -235,3 +235,89 @@ async function placeOrder(event) {
 
 save();
 load();
+function openTracker() {
+  document.getElementById("tracker").classList.add("show");
+  document.getElementById("trackingResult").innerHTML = "";
+}
+
+function closeTracker() {
+  document.getElementById("tracker").classList.remove("show");
+}
+
+function statusText(status) {
+  const names = {
+    NEW: "Order Placed",
+    CONFIRMED: "Confirmed",
+    PROCESSING: "Processing",
+    SHIPPED: "Dispatched",
+    DELIVERED: "Delivered"
+  };
+
+  return names[status] || status;
+}
+
+function trackingHtml(status) {
+  const steps = [
+    "NEW",
+    "CONFIRMED",
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED"
+  ];
+
+  const current = steps.indexOf(status);
+
+  return `
+    <div class="tracking-steps">
+      ${steps.map((step, i) => `
+        <div class="tracking-step ${i <= current ? "done" : ""}">
+          <span>${i <= current ? "✓" : "○"}</span>
+          <b>${statusText(step)}</b>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+async function trackOrder() {
+  const orderNo = document.getElementById("trackOrderNo").value.trim();
+  const phone = document.getElementById("trackPhone").value.trim();
+  const result = document.getElementById("trackingResult");
+
+  if (!orderNo || !phone) {
+    result.innerHTML = "<p>Please enter order number and phone number.</p>";
+    return;
+  }
+
+  result.innerHTML = "<p>Checking order...</p>";
+
+  try {
+    const response = await fetch(
+      "/api/track-order?order_no=" +
+      encodeURIComponent(orderNo) +
+      "&phone=" +
+      encodeURIComponent(phone)
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      result.innerHTML =
+        "<p>❌ " + (data.error || "Order not found.") + "</p>";
+      return;
+    }
+
+    result.innerHTML = `
+      <div class="tracking-result">
+        <h3>Order #${data.order_no}</h3>
+        <p>Total: <b>₹${data.total}</b></p>
+        <p>Current Status: <b>${statusText(data.order_status)}</b></p>
+
+        ${trackingHtml(data.order_status)}
+      </div>
+    `;
+  } catch (error) {
+    result.innerHTML =
+      "<p>Unable to check the order right now.</p>";
+  }
+}
