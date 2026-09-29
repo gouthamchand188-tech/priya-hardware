@@ -264,6 +264,63 @@ app.post("/api/products", requireAdmin, (req, res) => {
     res.json({ id: r.lastInsertRowid });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
+app.post("/api/products/bulk", requireAdmin, (req, res) => {
+  const products = Array.isArray(req.body?.products) ? req.body.products : [];
+
+  if (!products.length) {
+    return res.status(400).json({ error: "No products supplied." });
+  }
+
+  if (products.length > 1000) {
+    return res.status(400).json({ error: "Maximum 1000 products per batch." });
+  }
+
+  const upsert = db.prepare(`
+    INSERT INTO products
+    (sku,name,category,brand,price,mrp,stock,description,image)
+    VALUES(?,?,?,?,?,?,?,?,?)
+    ON CONFLICT(sku) DO UPDATE SET
+      name=excluded.name,
+      category=excluded.category,
+      brand=excluded.brand,
+      price=excluded.price,
+      mrp=excluded.mrp,
+      stock=excluded.stock,
+      description=excluded.description,
+      image=excluded.image,
+      active=1
+  `);
+
+  try {
+    const imported = db.transaction(() => {
+      let count = 0;
+
+      for (const p of products) {
+        if (!p.sku || !p.name || !p.category) continue;
+
+        upsert.run(
+          String(p.sku).trim(),
+          String(p.name).trim(),
+          String(p.category).trim(),
+          String(p.brand || "").trim(),
+          Number(p.price) || 0,
+          Number(p.mrp) || 0,
+          Math.max(0, Number(p.stock) || 0),
+          String(p.description || "").trim(),
+          String(p.image || "").trim()
+        );
+
+        count++;
+      }
+
+      return count;
+    })();
+
+    res.json({ ok: true, imported });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
 app.put("/api/products/:id", requireAdmin, (req, res) => {
   const p = req.body || {};
   if (!p.name || !p.category) return res.status(400).json({ error: "Name and category required" });
